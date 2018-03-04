@@ -1,6 +1,7 @@
 # Pima CC CIS278 Week #10 
 ## Exercise 21.11 
 ### Hangman Game
+C++ How to Program, 10/e, Deitel
 
 Write a program that plays the game of Hangman. The program should pick a word (which is either coded directly into the program or read from a text file) and display the following:
 ```Text
