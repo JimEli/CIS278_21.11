@@ -2,7 +2,7 @@
 * Title: Hangman Game
 * File: CIS278_Week10_21.11.cpp
 * Author: James Eli
-* Date: 1/17/2018
+* Date: 2/9/2018
 *
 * Exercise 21.11 on page 896, Hangman Game
 * Write a program that plays the game of Hangman. The program should pick a
@@ -28,11 +28,11 @@
 * Submitted in partial fulfillment of the requirements of PCC CIS-278.
 *************************************************************************
 * Change Log:
-*   01/17/2018: Initial release. JME
+*   02/09/2018: Initial release. JME
 *************************************************************************/
 #include <iostream>  // cin/cout/endl
 #include <string>    // string
-#include <list>      // list
+#include <vector>    // vector
 #include <ctime>     // time for random seed
 #include <random>    // random
 #include <cctype>    // isalpha/tolower
@@ -41,7 +41,7 @@
 using namespace std;
 
 // Get single character user input.
-char getUserInput(string prompt)
+char getUserInput(const string prompt)
 {
 	char input;
 
@@ -55,22 +55,11 @@ char getUserInput(string prompt)
 	// Eat any remaining chars and LF.
 	cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-	return input;
-}
-
-// Check if guessed character has any matches in word.
-int checkMatch(const string& s, string& d, const char c)
-{
-	// Replace 'X' with (guess) matching character.
-	transform(s.begin(), s.end(), d.begin(), d.begin(),
-		[&](char s, char d) { if (s == c) { return c; } else return d; }
-	);
-	// Return number of characteres replaced.
-	return count(d.begin(), d.end(), c);
+	return tolower(input);
 }
 
 // Check if character is already stored in list of guesses.
-bool checkLetter(list<char>& ltrs, const char c, const string response)
+bool checkLetter(vector<char>& ltrs, const char c, const string response)
 {
 	if (find(ltrs.begin(), ltrs.end(), c) == ltrs.end())
 	{
@@ -87,64 +76,64 @@ bool checkLetter(list<char>& ltrs, const char c, const string response)
 int main()
 {
 	// Number of words.
-	const int numWords{ 30 };
-	// Maximum guesses before the user is hung.
-	const unsigned maxGuesses{ 7 };
+	const unsigned numWords{ 15 };
 
 	// Lambda random number generator [0...numWords].
-	auto rng = [&]() -> unsigned { return int(numWords * rand() / (RAND_MAX + 1.0)); };
+	auto rng = [=]() -> unsigned { return int(numWords * rand() / (RAND_MAX + 1.0)); };
 	// Seed the rng.
-	srand(static_cast<unsigned>(time(0))); rng(); 
-	// Display program purpose.
-	cout << "Let's play a game of Hangman!\n";
+	srand(static_cast<unsigned>(time(0))); rng();
 
 	do {
-		// List of words to guess (ten each 5, 6 & 7 character long).
+		// Sample list of words to guess (five each 5, 6 & 7 character long).
 		string words[numWords] = {
-			"blimp", "inuit", "roach", "ankle", "stogy",
-			"could", "mover", "lovey", "snide", "parch", 
-			"queazy", "quartz", "quacky", "jockey", "jinxed",
-			"hijack", "coccyx", "jacked", "jackal", "jumped",
-			"primate", "humidor", "pismire", "hypoxia", "alcohol",
-			"located", "ectopic", "crochet", "polymer", "worsted"
+			"blimp", "inuit", "roach", "ankle", "could",
+			"visual", "quartz", "studio", "jockey", "hijack",
+			"located", "alcohol", "crochet", "polymer", "humidor"
 		};
-		// Characters make up the gallows.
+		// Characters making up the gallows.
 		string gallows[] =
 		{
-			"  |\n  |\n  |\n  |",                // empty gallows
-			"  |  O\n  |\n  |\n  |",             // +head
-			"  |  O\n  | /\n  |\n  |",           // +left arm
-			"  |  O\n  | /|\n  |\n  |",          // +body
-			"  |  O\n  | /|\\\n  |\n  |",        // +right arm
-			"  |  O\n  | /|\\\n  |  |\n  |",     // +torso
-			"  |  O\n  | /|\\\n  |  |\n  | /",   // +left leg
-			"  |  O\n  | /|\\\n  |  |\n  | / \\" // +right leg (complete)
+			"  |  O\n  | /|\\\n  |  |\n  | / \\", // right leg (complete)
+			"  |  O\n  | /|\\\n  |  |\n  | /",    // left leg
+			"  |  O\n  | /|\\\n  |  |\n  |",      // torso
+			"  |  O\n  | /|\\\n  |\n  |",         // right arm
+			"  |  O\n  | /|\n  |\n  |",           // body
+			"  |  O\n  | /\n  |\n  |",            // left arm
+			"  |  O\n  |\n  |\n  |",              // head
+			"  |\n  |\n  |\n  |"                  // empty gallows
 		};
 
-		list<char> guessedLetters;
-		unsigned numWrongGuesses{ 0 };
-		unsigned numCorrectLetters{ 0 };
-		unsigned rn{ rng() };
-		const size_t numLetters{ words[rn].size() };
-		string clue = { string(words[rn].size(), 'X') };
+		vector<char> guessedLetters;      // List of guessed letters.
+		guessedLetters.clear();         // Empty the list.
+		unsigned remainingGuesses{ 7 }; // Number of guesses remianing.
+		unsigned rn{ rng() };           // Get a random number.
+		size_t remainingLetters{ words[rn].size() };     // Number un-guessed letters remaining in word.
+		string clue = { string(words[rn].size(), 'X') }; // Display word clue.
 
-		guessedLetters.clear();
+		// Display program purpose.
+		cout << "Let's play a game of Hangman!\n\n";
 
-		// Loop until word is guesses or user is hung.
-		while (numCorrectLetters < numLetters && numWrongGuesses < maxGuesses) {
-			// Display clue and get user guess.
+		// Loop until word is guessed or user is hung.
+		while (remainingLetters && remainingGuesses) {
+			// Display clue and get a user guess.
 			char g = getUserInput("Guess the word: " + clue + "\n");
 
-			if (isalpha(g)) 
-				if (int matchedLetters = checkMatch(words[rn], clue, tolower(g)))
-					// Good guess.
-					numCorrectLetters += (checkLetter(guessedLetters, g, "Good guess!\n") ? matchedLetters : 0);
-				else
-					// Bad guess.
-					numWrongGuesses += (checkLetter(guessedLetters, g, "Wrong guess!\n") ? 1 : 0);
+			if (isalpha(g)) {
+				// Replace 'X' with matching character.
+				transform(words[rn].cbegin(), words[rn].cend(), clue.begin(), clue.begin(),
+					[=](char s, char d) { if (s == g) { return g; } else return d; });
+			}
+
+			// Check if guessed character had any matches in word.
+			if (int matchedLetters = count(clue.cbegin(), clue.cend(), g))
+				// Correct guess, decrement remaining letters by proper amount.
+				remainingLetters -= (checkLetter(guessedLetters, g, "Good guess!\n") ? matchedLetters : 0);
+			else
+				// Wrong guess, decrement number of remaining guesses.
+				remainingGuesses -= (checkLetter(guessedLetters, g, "Wrong guess!\n") ? 1 : 0);
 
 			// Display results of guess.
-			cout << "   ____\n  |  |\n" << gallows[numWrongGuesses] << "\n _|_____\n";
+			cout << "   ____\n  |  |\n" << gallows[remainingGuesses] << "\n _|_____\n";
 			cout << "Letters guessed: ";
 			for (char c : guessedLetters)
 				cout << c << " ";
@@ -152,13 +141,16 @@ int main()
 		}
 
 		// Display result of game.
-		if (numCorrectLetters == numLetters)
-			cout << "Congratulations!!! You guessed my word. ";
-		else
-			cout << "You've been hung!!! ";
+		if (!remainingLetters)
+		{
+			cout << "Congratulations!!! You guessed my word \"" << clue << "\" ";
+			cout << "with " << guessedLetters.size() << " guesses!\n";
+		}
 
-	} while (getUserInput("Play again? yes/no ") == 'y');
+		else
+			cout << "You've been hung!!!\n";
+
+	} while (tolower(getUserInput("Play again? yes/no ")) == 'y');
 
 	return 0;
 }
-
