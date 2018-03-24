@@ -46,7 +46,6 @@ char getUserInput(const string prompt)
 	char input;
 
 	cout << prompt;
-
 	// Input from user.
 	cin.get(input);
 	if (cin.peek() != '\n')
@@ -54,7 +53,6 @@ char getUserInput(const string prompt)
 		input = 0;
 	// Eat any remaining chars and LF.
 	cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
 	return tolower(input);
 }
 
@@ -69,7 +67,6 @@ bool checkLetter(vector<char>& ltrs, const char c, const string response)
 	}
 	else
 		cout << "You already guessed \"" << c << "\"\n";
-	
 	return false;
 }
 
@@ -77,12 +74,10 @@ int main()
 {
 	// Number of words.
 	const unsigned numWords{ 15 };
-
 	// Lambda random number generator [0...numWords].
 	auto rng = [=]() -> unsigned { return int(numWords * rand() / (RAND_MAX + 1.0)); };
 	// Seed the rng.
 	srand(static_cast<unsigned>(time(0))); rng();
-
 	do {
 		// Sample list of words to guess (five each 5, 6 & 7 character long).
 		string words[numWords] = {
@@ -100,7 +95,9 @@ int main()
 			"  |  O\n  | /|\n  |\n  |",           // body
 			"  |  O\n  | /\n  |\n  |",            // left arm
 			"  |  O\n  |\n  |\n  |",              // head
-			"  |\n  |\n  |\n  |"                  // empty gallows
+			"  |\n  |\n  |\n  |",                 // empty gallows
+			"   ____\n  |  |\n",                  // gallows top
+			"\n _|_____\n"                        // gallows base
 		};
 
 		vector<char> guessedLetters;      // List of guessed letters.
@@ -133,7 +130,8 @@ int main()
 				remainingGuesses -= (checkLetter(guessedLetters, g, "Wrong guess!\n") ? 1 : 0);
 
 			// Display results of guess.
-			cout << "   ____\n  |  |\n" << gallows[remainingGuesses] << "\n _|_____\n";
+			const unsigned TOP{ 8 }, BASE{ 9 };
+			cout << gallows[TOP] << gallows[remainingGuesses] << gallows[BASE];
 			cout << "Letters guessed: ";
 			for (char c : guessedLetters)
 				cout << c << " ";
