@@ -119,7 +119,7 @@ void playHangman()
 	std::random_device rd;
 	std::mt19937 mt(rd());                                           // Non-deterministic 32-bit seed.
 	unsigned remainingGuesses{ MAX_GUESSES };                        // Number of guesses remianing.
-	unsigned randNum{ dist(mt) };		                         // Random number distribution [0, numWords] [inclusive, inclusive].
+	unsigned randNum{ dist(mt) };		                         // Random number distribution [inclusive, inclusive].
 	size_t remainingLetters{ words[randNum].size() };                // Number un-guessed letters remaining in word.
 	std::string clue = { std::string(words[randNum].size(), 'X') };  // Display word clue.
 	std::vector<char> guessedLetters;                                // List of guessed letters.
