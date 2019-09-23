@@ -137,7 +137,6 @@ void playHangman()
 			// Replace 'X' with matching character.
 			std::transform(words[randNum].cbegin(), words[randNum].cend(), clue.begin(), clue.begin(),
 				[=](char s, char d) { return (s == guess ? guess : d); });
-				//[=](char s, char d) { if (s == guess) { return guess; } else return d; });
 
 		// Check if guessed character had any matches in word.
 		if (int matchedLetters = std::count(clue.cbegin(), clue.cend(), guess))
