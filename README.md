@@ -22,4 +22,4 @@ After each guess, display all user guesses. If the user guesses the word correct
 Notes:
 * Compiled with MS Visual Studio 2017 Community (v141).
 * Submitted in partial fulfillment of the requirements of PCC CIS-278.
-* Updated code per suggestions received on StackExchange Code Review [here] (https://codereview.stackexchange.com/questions/229422/hangman-game-yahg)
+* Updated code per suggestions received on StackExchange Code Review [here](https://codereview.stackexchange.com/questions/229422/hangman-game-yahg)
