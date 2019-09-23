@@ -57,6 +57,7 @@ std::vector<std::string> words
 
 class Gallows
 {
+	// String representations of gallows with/without hanging body.
 	const std::string gallows[GALLOWS_SIZE] =
 	{
 		"  |  O\n  | /|\\\n  |  |\n  | / \\", // right leg (complete)
@@ -72,6 +73,7 @@ class Gallows
 	};
 
   public:
+	// Display appropriate stage of hanging.
 	void show(const int stage)
 	{
 		if (stage >= 0 && stage < GALLOWS_SIZE)
